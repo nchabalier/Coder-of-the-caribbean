@@ -1,11 +1,10 @@
 package com.company;
 
-import static jdk.nashorn.internal.objects.NativeArray.join;
 
 /**
  * Created by Nicolas on 14/04/2017.
  */
-public class Coord {
+class Coord {
     private final static int[][] DIRECTIONS_EVEN = new int[][] { { 1, 0 }, { 0, -1 }, { -1, -1 }, { -1, 0 }, { -1, 1 }, { 0, 1 } };
     private final static int[][] DIRECTIONS_ODD = new int[][] { { 1, 0 }, { 1, -1 }, { 0, -1 }, { -1, 0 }, { 0, 1 }, { 1, 1 } };
     public final int x;

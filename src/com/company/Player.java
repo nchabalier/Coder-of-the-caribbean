@@ -1,44 +1,74 @@
 package com.company;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by Nicolas on 14/04/2017.
  */
-public class Player {
-    private int id;
-    private List<Referee.Ship> ships;
-    private List<Referee.Ship> shipsAlive;
+import java.util.*;
+import java.io.*;
+import java.math.*;
 
-    public Player(int id) {
-        this.id = id;
-        this.ships = new ArrayList<>();
-        this.shipsAlive = new ArrayList<>();
-    }
+/**
+ * Auto-generated code below aims at helping you parse
+ * the standard input according to the problem statement.
+ **/
+class Player {
 
-    public void setDead() {
-        for (Referee.Ship ship : ships) {
-            ship.health = 0;
+    public static void main(String args[]) {
+        Scanner in = new Scanner(System.in);
+
+        PlayerAgent myAgent = new PlayerAgent(0);
+
+
+        // game loop
+        while (true) {
+
+
+            List<Ship> myShips = new ArrayList<>();
+            List<RumBarrel> rumBarrels = new ArrayList<>();
+
+            int myShipCount = in.nextInt(); // the number of remaining ships
+            int entityCount = in.nextInt(); // the number of entities (e.g. ships, mines or cannonballs)
+
+            for (int i = 0; i < entityCount; i++) {
+                int entityId = in.nextInt();
+                String entityType = in.next();
+                int x = in.nextInt();
+                int y = in.nextInt();
+                int arg1 = in.nextInt(); //orientation (0,5)
+                int arg2 = in.nextInt(); //vitesse (0,1,2)
+                int arg3 = in.nextInt(); //niveau de stock de rhum
+                int arg4 = in.nextInt(); //1 si le ateau vous appartient, 0 sinon
+
+                switch (entityType) {
+                    case "SHIP":
+                        //TODO: to the same for ennemy's ships
+                        if(entityId == 0) {
+                            Ship ship = new Ship(x,y,arg1,arg4);
+                            ship.setSpeed(arg2);
+                            ship.setHealth(arg3);
+                        }
+                        break;
+                    case "BARREL":
+                        RumBarrel rumBarrel = new RumBarrel(x,y,arg3);
+                        rumBarrels.add(rumBarrel);
+                        break;
+                    case"MINE":
+                        //TODO
+                        break;
+                    case "CANNONBALL":
+                        //TODO
+                        break;
+                }
+
+
+            }
+            for (int i = 0; i < myShipCount; i++) {
+
+                // Write an action using System.out.println()
+                // To debug: System.err.println("Debug messages...");
+
+                System.out.println("MOVE 11 10"); // Any valid action, such as "WAIT" or "MOVE x y"
+            }
         }
-    }
-
-    public int getScore() {
-        int score = 0;
-        for (Referee.Ship ship : ships) {
-            score += ship.health;
-        }
-        return score;
-    }
-
-    public List<String> toViewString() {
-        List<String> data = new ArrayList<>();
-
-        data.add(String.valueOf(this.id));
-        for (Referee.Ship ship : ships) {
-            data.add(ship.toViewString());
-        }
-
-        return data;
     }
 }

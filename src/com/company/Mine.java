@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Created by Nicolas on 14/04/2017.
  */
-public class Mine extends Entity {
+class Mine extends Entity {
     public Mine(int x, int y) {
         super(EntityType.MINE, x, y);
     }

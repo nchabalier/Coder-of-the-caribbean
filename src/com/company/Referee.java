@@ -1175,7 +1175,7 @@ class Referee {
     protected String[] getInputForPlayer(int round, int playerIdx) {
         List<String> data = new ArrayList<>();
 
-        // Player's ships first
+        // PlayerAgent's ships first
         for (Ship ship : players.get(playerIdx).shipsAlive) {
             data.add(ship.toPlayerString(playerIdx));
         }

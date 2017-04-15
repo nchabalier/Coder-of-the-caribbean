@@ -1,11 +1,10 @@
 package com.company;
 
-import static com.company.Referee.join;
 
 /**
  * Created by Nicolas on 14/04/2017.
  */
-public class RumBarrel extends Entity {
+class RumBarrel extends Entity {
     private int health;
 
     public RumBarrel(int x, int y, int health) {
@@ -14,7 +13,7 @@ public class RumBarrel extends Entity {
     }
 
     public String toViewString() {
-        return join(id, position.y, position.x, health);
+        return Referee.join(id, position.y, position.x, health);
     }
 
     public String toPlayerString(int playerIdx) {

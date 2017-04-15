@@ -1,11 +1,10 @@
 package com.company;
 
-import static com.company.Referee.join;
 
 /**
  * Created by Nicolas on 14/04/2017.
  */
-public class Cannonball extends Entity {
+class Cannonball extends Entity {
     final int ownerEntityId;
     final int srcX;
     final int srcY;
@@ -21,7 +20,7 @@ public class Cannonball extends Entity {
     }
 
     public String toViewString() {
-        return join(id, position.y, position.x, srcY, srcX, initialRemainingTurns, remainingTurns, ownerEntityId);
+        return Referee.join(id, position.y, position.x, srcY, srcX, initialRemainingTurns, remainingTurns, ownerEntityId);
     }
 
     public String toPlayerString(int playerIdx) {

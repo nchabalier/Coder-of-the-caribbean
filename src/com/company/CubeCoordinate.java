@@ -3,7 +3,7 @@ package com.company;
 /**
  * Created by Nicolas on 14/04/2017.
  */
-public class CubeCoordinate {
+class CubeCoordinate {
     static int[][] directions = new int[][] { { 1, -1, 0 }, { +1, 0, -1 }, { 0, +1, -1 }, { -1, +1, 0 }, { -1, 0, +1 }, { 0, -1, +1 } };
     int x, y, z;
 

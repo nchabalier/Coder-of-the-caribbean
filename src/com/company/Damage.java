@@ -1,11 +1,10 @@
 package com.company;
 
-import static com.company.Referee.join;
 
 /**
  * Created by Nicolas on 14/04/2017.
  */
-public class Damage {
+class Damage {
     private final Coord position;
     private final int health;
     private final boolean hit;
@@ -17,6 +16,6 @@ public class Damage {
     }
 
     public String toViewString() {
-        return join(position.y, position.x, health, (hit ? 1 : 0));
+        return Referee.join(position.y, position.x, health, (hit ? 1 : 0));
     }
 }

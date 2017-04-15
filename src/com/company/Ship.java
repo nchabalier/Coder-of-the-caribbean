@@ -3,14 +3,37 @@ package com.company;
 
 import java.util.List;
 
-import static com.company.Referee.INITIAL_SHIP_HEALTH;
-import static com.company.Referee.join;
 
 /**
  * Created by Nicolas on 14/04/2017.
  */
-public class Ship extends Entity {
+class Ship extends Entity {
     int orientation;
+
+    public int getOrientation() {
+        return orientation;
+    }
+
+    public void setOrientation(int orientation) {
+        this.orientation = orientation;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+
+    public int getHealth() {
+        return health;
+    }
+
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
     int speed;
     int health;
     int owner;
@@ -28,12 +51,12 @@ public class Ship extends Entity {
         super(EntityType.SHIP, x, y);
         this.orientation = orientation;
         this.speed = 0;
-        this.health = INITIAL_SHIP_HEALTH;
+        this.health = Referee.INITIAL_SHIP_HEALTH;
         this.owner = owner;
     }
 
     public String toViewString() {
-        return join(id, position.y, position.x, orientation, health, speed, (action != null ? action : "WAIT"), bow().y, bow().x, stern().y,
+        return Referee.join(id, position.y, position.x, orientation, health, speed, (action != null ? action : "WAIT"), bow().y, bow().x, stern().y,
                 stern().x, " ;" + (message != null ? message : ""));
     }
 
