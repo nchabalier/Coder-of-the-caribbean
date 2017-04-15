@@ -25,30 +25,30 @@ import java.util.stream.Stream;
 class Referee {
     private static final int LEAGUE_LEVEL = 3;
 
-    private static final int MAP_WIDTH = 23;
-    private static final int MAP_HEIGHT = 21;
-    private static final int COOLDOWN_CANNON = 2;
-    private static final int COOLDOWN_MINE = 5;
-    private static final int INITIAL_SHIP_HEALTH = 100;
-    private static final int MAX_SHIP_HEALTH = 100;
-    private static final int MAX_SHIP_SPEED;
-    private static final int MIN_SHIPS = 1;
-    private static final int MAX_SHIPS;
-    private static final int MIN_MINES;
-    private static final int MAX_MINES;
-    private static final int MIN_RUM_BARRELS = 10;
-    private static final int MAX_RUM_BARRELS = 26;
-    private static final int MIN_RUM_BARREL_VALUE = 10;
-    private static final int MAX_RUM_BARREL_VALUE = 20;
-    private static final int REWARD_RUM_BARREL_VALUE = 30;
-    private static final int MINE_VISIBILITY_RANGE = 5;
-    private static final int FIRE_DISTANCE_MAX = 10;
-    private static final int LOW_DAMAGE = 25;
-    private static final int HIGH_DAMAGE = 50;
-    private static final int MINE_DAMAGE = 25;
-    private static final int NEAR_MINE_DAMAGE = 10;
-    private static final boolean CANNONS_ENABLED;
-    private static final boolean MINES_ENABLED;
+    public static final int MAP_WIDTH = 23;
+    public static final int MAP_HEIGHT = 21;
+    public static final int COOLDOWN_CANNON = 2;
+    public static final int COOLDOWN_MINE = 5;
+    public static final int INITIAL_SHIP_HEALTH = 100;
+    public static final int MAX_SHIP_HEALTH = 100;
+    public static final int MAX_SHIP_SPEED;
+    public static final int MIN_SHIPS = 1;
+    public static final int MAX_SHIPS;
+    public static final int MIN_MINES;
+    public static final int MAX_MINES;
+    public static final int MIN_RUM_BARRELS = 10;
+    public static final int MAX_RUM_BARRELS = 26;
+    public static final int MIN_RUM_BARREL_VALUE = 10;
+    public static final int MAX_RUM_BARREL_VALUE = 20;
+    public static final int REWARD_RUM_BARREL_VALUE = 30;
+    public static final int MINE_VISIBILITY_RANGE = 5;
+    public static final int FIRE_DISTANCE_MAX = 10;
+    public static final int LOW_DAMAGE = 25;
+    public static final int HIGH_DAMAGE = 50;
+    public static final int MINE_DAMAGE = 25;
+    public static final int NEAR_MINE_DAMAGE = 10;
+    public static final boolean CANNONS_ENABLED;
+    public static final boolean MINES_ENABLED;
 
     static {
         switch (LEAGUE_LEVEL) {
