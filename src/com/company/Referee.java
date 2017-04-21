@@ -113,6 +113,14 @@ class Referee {
         private final int x;
         private final int y;
 
+        public int getX() {
+            return x;
+        }
+
+        public int getY() {
+            return y;
+        }
+
         public Coord(int x, int y) {
             this.x = x;
             this.y = y;
@@ -229,6 +237,26 @@ class Referee {
             this.position = new Coord(x, y);
         }
 
+        public Entity getNearestEntity(List<Entity> entities) {
+
+            int minimalDistance = Integer.MAX_VALUE;
+            Entity nearestEntity = null;
+
+            for (Entity entity : entities) {
+                int distance = this.distanceTo(entity);
+                if (distance < minimalDistance) {
+                    minimalDistance = distance;
+                    nearestEntity = entity;
+                }
+            }
+            return nearestEntity;
+        }
+
+
+        public int distanceTo(Entity entity) {
+            return this.position.distanceTo(entity.position);
+        }
+
         public String toViewString() {
             return join(id, position.y, position.x);
         }
@@ -236,6 +264,11 @@ class Referee {
         protected String toPlayerString(int arg1, int arg2, int arg3, int arg4) {
             return join(id, type.name(), position.x, position.y, arg1, arg2, arg3, arg4);
         }
+
+        public String toPositionString() {
+            return this.position.toString();
+        }
+
     }
 
     public static class Mine extends Entity {
@@ -351,7 +384,10 @@ class Referee {
     }
 
     public static class Ship extends Entity {
+
+
         int orientation;
+
         int speed;
         int health;
         int owner;
@@ -371,6 +407,31 @@ class Referee {
             this.speed = 0;
             this.health = INITIAL_SHIP_HEALTH;
             this.owner = owner;
+        }
+
+
+        public int getOrientation() {
+            return orientation;
+        }
+
+        public void setOrientation(int orientation) {
+            this.orientation = orientation;
+        }
+
+        public int getSpeed() {
+            return speed;
+        }
+
+        public void setSpeed(int speed) {
+            this.speed = speed;
+        }
+
+        public int getHealth() {
+            return health;
+        }
+
+        public void setHealth(int health) {
+            this.health = health;
         }
 
         public String toViewString() {
@@ -599,7 +660,7 @@ class Referee {
         }
     }
 
-    private static class Player {
+    protected static class Player {
         private int id;
         private List<Ship> ships;
         private List<Ship> shipsAlive;
@@ -759,6 +820,27 @@ class Referee {
         }
 
     }
+
+
+    protected void initReferee2() {
+
+        ships = new ArrayList<>();
+        damage= new ArrayList<>();
+        shipLosts= new ArrayList<>();
+        cannonBallExplosions= new ArrayList<>();
+    }
+
+    protected void updateReferee2(List<Player> players, List<Mine> mines, List<Cannonball> cannonballs) {
+
+        this.players = players;
+        this.mines = mines;
+        this.cannonballs = cannonballs;
+
+        for(Player player : players) {
+            ships.addAll(player.ships);
+        }
+    }
+
 
     protected Properties getConfiguration() {
         Properties prop = new Properties();
@@ -1297,5 +1379,48 @@ class Referee {
 
     protected int getMillisTimeForRound() {
         return 50;
+    }
+
+    public void displayMap() {
+        char map[][] = new char[MAP_HEIGHT][MAP_WIDTH];
+
+        for(int i=0; i<MAP_HEIGHT; i++) {
+            for(int j=0; j<MAP_WIDTH; j++) {
+                map[i][j] = '.';
+            }
+        }
+/*        private List<Cannonball> cannonballs;
+        private List<Mine> mines;
+        private List<RumBarrel> barrels;
+        private List<Player> players;
+        private List<Ship> ships;
+        private List<Damage> damage;
+        private List<Ship> shipLosts;
+        private List<Coord> cannonBallExplosions;*/
+
+        for(Mine mine : this.mines) {
+            Coord coord = mine.position;
+            map[coord.getY()][coord.getX()] = 'M';
+        }
+
+
+        for(Ship ship : this.ships) {
+            Coord coord = ship.position;
+            map[coord.getY()][coord.getX()] = 'S';
+        }
+
+        for(RumBarrel rumBarrel : this.barrels) {
+            Coord coord = rumBarrel.position;
+            map[coord.getY()][coord.getX()] = 'R';
+        }
+
+        for(Cannonball cannonball : this.cannonballs) {
+            Coord coord = cannonball.position;
+            map[coord.getY()][coord.getX()] = 'C';
+        }
+
+        for(int i=0; i<MAP_HEIGHT; i++) {
+            System.out.println(map[i]);
+        }
     }
 }

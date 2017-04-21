@@ -16,7 +16,7 @@ class Player {
     public static void main(String args[]) {
         Scanner in = new Scanner(System.in);
 
-        PlayerAgent myAgent = new PlayerAgent(0);
+        Referee.Player myAgent = new  Referee.Player(0);
 
         //TO REMOVE
         int cmpCannon= 0;
@@ -25,10 +25,10 @@ class Player {
         while (true) {
 
 
-            List<Entity> myShips = new ArrayList<>();
-            List<Entity> ennemiesShips = new ArrayList<>();
-            List<Entity> rumBarrels = new ArrayList<>();
-            List<Entity> mines = new ArrayList<>();
+            List<Referee.Entity> myShips = new ArrayList<>();
+            List<Referee.Entity> ennemiesShips = new ArrayList<>();
+            List<Referee.Entity> rumBarrels = new ArrayList<>();
+            List<Referee.Entity> mines = new ArrayList<>();
 
             int myShipCount = in.nextInt(); // the number of remaining ships
             int entityCount = in.nextInt(); // the number of entities (e.g. ships, mines or cannonballs)
@@ -45,7 +45,7 @@ class Player {
 
                 switch (entityType) {
                     case "SHIP":
-                        Ship ship = new Ship(x,y,arg1,arg4);
+                        Referee.Ship ship = new Referee.Ship(x,y,arg1,arg4);
                         ship.setSpeed(arg2);
                         ship.setHealth(arg3);
 
@@ -56,11 +56,11 @@ class Player {
                         }
                         break;
                     case "BARREL":
-                        RumBarrel rumBarrel = new RumBarrel(x,y,arg3);
+                        Referee.RumBarrel rumBarrel = new Referee.RumBarrel(x,y,arg3);
                         rumBarrels.add(rumBarrel);
                         break;
                     case"MINE":
-                        Mine mine = new Mine(x, y);
+                        Referee.Mine mine = new Referee.Mine(x, y);
                         mines.add(mine);
                         break;
                     case "CANNONBALL":
@@ -84,7 +84,7 @@ class Player {
 
                 } else {
 
-                    Entity nearestEntity = myShips.get(i).getNearestEntity(rumBarrels);
+                    Referee.Entity nearestEntity = myShips.get(i).getNearestEntity(rumBarrels);
                     if(nearestEntity!=null) {
                         System.out.println("MOVE " + nearestEntity.toPositionString()); // Any valid action, such as "WAIT" or "MOVE x y"
                     } else {

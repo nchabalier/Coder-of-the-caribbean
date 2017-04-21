@@ -1,6 +1,7 @@
 import sys
 import os
 import glob
+import time
 
 
 javafiles = glob.glob("*.java")
@@ -33,3 +34,4 @@ for file_name in javafiles:
     file.close()
 
 final_file.close()
+time.sleep(5.5)
