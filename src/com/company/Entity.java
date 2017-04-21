@@ -1,6 +1,8 @@
 package com.company;
 
 
+import java.util.List;
+
 /**
  * Created by Nicolas on 14/04/2017.
  */
@@ -23,5 +25,28 @@ abstract class Entity {
 
     protected String toPlayerString(int arg1, int arg2, int arg3, int arg4) {
         return Referee.join(id, type.name(), position.x, position.y, arg1, arg2, arg3, arg4);
+    }
+
+    public Entity getNearestEntity(List<Entity> entities) {
+
+        int minimalDistance = Integer.MAX_VALUE;
+        Entity nearestEntity = null;
+
+        for(Entity entity : entities) {
+            int distance = this.distanceTo(entity);
+            if(distance<minimalDistance) {
+                minimalDistance = distance;
+                nearestEntity = entity;
+            }
+        }
+        return nearestEntity;
+    }
+
+    public int distanceTo(Entity entity) {
+        return this.position.distanceTo(entity.position);
+    }
+
+    public String toPositionString() {
+        return position.toString();
     }
 }

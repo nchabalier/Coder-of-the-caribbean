@@ -18,13 +18,17 @@ class Player {
 
         PlayerAgent myAgent = new PlayerAgent(0);
 
+        //TO REMOVE
+        int cmpCannon= 0;
 
         // game loop
         while (true) {
 
 
-            List<Ship> myShips = new ArrayList<>();
-            List<RumBarrel> rumBarrels = new ArrayList<>();
+            List<Entity> myShips = new ArrayList<>();
+            List<Entity> ennemiesShips = new ArrayList<>();
+            List<Entity> rumBarrels = new ArrayList<>();
+            List<Entity> mines = new ArrayList<>();
 
             int myShipCount = in.nextInt(); // the number of remaining ships
             int entityCount = in.nextInt(); // the number of entities (e.g. ships, mines or cannonballs)
@@ -37,15 +41,18 @@ class Player {
                 int arg1 = in.nextInt(); //orientation (0,5)
                 int arg2 = in.nextInt(); //vitesse (0,1,2)
                 int arg3 = in.nextInt(); //niveau de stock de rhum
-                int arg4 = in.nextInt(); //1 si le ateau vous appartient, 0 sinon
+                int arg4 = in.nextInt(); //1 si le bateau vous appartient, 0 sinon
 
                 switch (entityType) {
                     case "SHIP":
-                        //TODO: to the same for ennemy's ships
-                        if(entityId == 0) {
-                            Ship ship = new Ship(x,y,arg1,arg4);
-                            ship.setSpeed(arg2);
-                            ship.setHealth(arg3);
+                        Ship ship = new Ship(x,y,arg1,arg4);
+                        ship.setSpeed(arg2);
+                        ship.setHealth(arg3);
+
+                        if(arg4 == 1) {
+                            myShips.add(ship);
+                        } else {
+                            ennemiesShips.add(ship);
                         }
                         break;
                     case "BARREL":
@@ -53,22 +60,44 @@ class Player {
                         rumBarrels.add(rumBarrel);
                         break;
                     case"MINE":
-                        //TODO
+                        Mine mine = new Mine(x, y);
+                        mines.add(mine);
                         break;
                     case "CANNONBALL":
-                        //TODO
+                        System.err.println("Canonball");
                         break;
                 }
 
 
             }
+
+
             for (int i = 0; i < myShipCount; i++) {
 
                 // Write an action using System.out.println()
                 // To debug: System.err.println("Debug messages...");
 
-                System.out.println("MOVE 11 10"); // Any valid action, such as "WAIT" or "MOVE x y"
+                if(cmpCannon >= 4) {
+                    cmpCannon = 0;
+                    //Fire the ennemie 1 on 4 tours
+                    System.out.println("FIRE " + ennemiesShips.get(0).toPositionString());
+
+                } else {
+
+                    Entity nearestEntity = myShips.get(i).getNearestEntity(rumBarrels);
+                    if(nearestEntity!=null) {
+                        System.out.println("MOVE " + nearestEntity.toPositionString()); // Any valid action, such as "WAIT" or "MOVE x y"
+                    } else {
+                        Random rand = new Random();
+                        int xRand = rand.nextInt()%Referee.MAP_WIDTH;
+                        int yRand = rand.nextInt()%Referee.MAP_HEIGHT;
+                        System.out.println("MOVE " + xRand + " " + yRand); // Any valid action, such as "WAIT" or "MOVE x y"
+                    }
+                }
+
             }
+
+            cmpCannon++;
         }
     }
 }

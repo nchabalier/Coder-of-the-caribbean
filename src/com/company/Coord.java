@@ -60,6 +60,7 @@ class Coord {
         return this.toCubeCoordinate().distanceTo(dst.toCubeCoordinate());
     }
 
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null || getClass() != obj.getClass()) {
@@ -72,6 +73,6 @@ class Coord {
     @Override
     public String toString() {
         //return join(x, y);
-        return "(" + x + " " + y + ")";
+        return x + " " + y;
     }
 }
