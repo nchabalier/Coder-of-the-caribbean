@@ -409,6 +409,12 @@ class Referee {
             this.owner = owner;
         }
 
+        public Ship(int x, int y, int orientation, int speed, int health, int owner) {
+            this(x,y,orientation,owner);
+            this.health = health;
+            this.speed = speed;
+        }
+
 
         public int getOrientation() {
             return orientation;
@@ -671,6 +677,20 @@ class Referee {
             this.shipsAlive = new ArrayList<>();
         }
 
+        public void addShip(Ship ship) {
+            ships.add(ship);
+            shipsAlive.add(ship);
+        }
+
+        public void clearShip() {
+            shipsAlive.clear();
+            ships.clear();
+        }
+
+        public List<Ship> getShips() {
+            return ships;
+        }
+
         public void setDead() {
             for (Ship ship : ships) {
                 ship.health = 0;
@@ -830,15 +850,19 @@ class Referee {
         cannonBallExplosions= new ArrayList<>();
     }
 
-    protected void updateReferee2(List<Player> players, List<Mine> mines, List<Cannonball> cannonballs) {
+    protected void updateReferee2(List<Player> players, List<Entity> mines, List<Entity> rumBarrels, List<Entity> cannonballs) {
 
         this.players = players;
-        this.mines = mines;
-        this.cannonballs = cannonballs;
+        this.mines = (List<Mine>)(List<?>)mines;
+        this.barrels = (List<RumBarrel>)(List<?>)rumBarrels;
+        this.cannonballs = (List<Cannonball>)(List<?>)cannonballs;
+        this.ships.clear();
 
         for(Player player : players) {
             ships.addAll(player.ships);
+            //System.err.println("Ships size: " + ships.size());
         }
+
     }
 
 
@@ -1214,6 +1238,7 @@ class Referee {
     }
 
     protected void updateGame(int round) throws  Exception {
+
         moveCannonballs();
         decrementRum();
 
@@ -1236,6 +1261,7 @@ class Referee {
         for (Iterator<Ship> it = ships.iterator(); it.hasNext();) {
             Ship ship = it.next();
             if (ship.health <= 0) {
+                System.err.println("Ship is dead !! ");
                 players.get(ship.owner).shipsAlive.remove(ship);
                 it.remove();
             }
