@@ -37,8 +37,7 @@ class Player {
 
 
 
-        //TO REMOVE
-        int cmpCannon= 0;
+        int round = 1;
 
         // game loop
         while (true) {
@@ -92,12 +91,10 @@ class Player {
 
 
             ref.updateReferee2(players, mines, rumBarrels, cannonballs);
-            ref.prepare(1);
-            try {
-                //ref.updateGame(1);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            ref.prepare(round);
+
+
+            String[] outputs = new String[myShipCount];
 
             for (int i = 0; i < myShipCount; i++) {
 
@@ -108,27 +105,46 @@ class Player {
                 // Write an action using System.out.println()
                 // To debug: System.err.println("Debug messages...");
 
-                if(cmpCannon >= 4) {
-                    cmpCannon = 0;
+                if(round % 4 == 0) {
                     //Fire the ennemie 1 on 4 tours
-                    System.out.println("FIRE " + ennemiesShips.get(0).toPositionString());
+                    outputs[i] = "FIRE " + ennemiesShips.get(0).toPositionString();
 
                 } else {
 
                     Referee.Entity nearestEntity = myShips.get(i).getNearestEntity(rumBarrels);
                     if(nearestEntity!=null) {
-                        System.out.println("MOVE " + nearestEntity.toPositionString()); // Any valid action, such as "WAIT" or "MOVE x y"
+                        outputs[i] = "MOVE " + nearestEntity.toPositionString(); // Any valid action, such as "WAIT" or "MOVE x y"
                     } else {
                         Random rand = new Random();
-                        int xRand = rand.nextInt()%Referee.MAP_WIDTH;
-                        int yRand = rand.nextInt()%Referee.MAP_HEIGHT;
-                        System.out.println("MOVE " + xRand + " " + yRand); // Any valid action, such as "WAIT" or "MOVE x y"
+                        int xRand = Math.abs(rand.nextInt())%Referee.MAP_WIDTH;
+                        int yRand = Math.abs(rand.nextInt())%Referee.MAP_HEIGHT;
+                        outputs[i] = "MOVE " + xRand + " " + yRand; // Any valid action, such as "WAIT" or "MOVE x y"
                     }
                 }
 
+
             }
 
-            cmpCannon++;
+            try {
+                ref.handlePlayerOutput(1,round,1,outputs);
+                ref.updateGame(round);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+            for (int i = 0; i < myShipCount; i++) {
+                System.out.println(outputs[i]);
+            }
+
+            round++;
+
+
+            String[] myInput = ref.getInputForPlayer(round,1);
+            for(String line : myInput) {
+                System.err.println(line);
+            }
+
         }
     }
 }
