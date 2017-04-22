@@ -1,22 +1,16 @@
 package com.company;
 
+import com.sun.org.apache.regexp.internal.RE;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.sql.Ref;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Random;
-import java.util.Scanner;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -227,7 +221,7 @@ class Referee {
     public static abstract class Entity {
         private static int UNIQUE_ENTITY_ID = 0;
 
-        protected final int id;
+        protected int id;
         protected final EntityType type;
         protected Coord position;
 
@@ -235,6 +229,16 @@ class Referee {
             this.id = UNIQUE_ENTITY_ID++;
             this.type = type;
             this.position = new Coord(x, y);
+        }
+
+        public Entity(EntityType type, int x, int y, int id) {
+            this.id = id;
+            this.type = type;
+            this.position = new Coord(x, y);
+        }
+
+        public int getId() {
+            return id;
         }
 
         public Entity getNearestEntity(List<Entity> entities) {
@@ -409,12 +413,18 @@ class Referee {
             this.owner = owner;
         }
 
-        public Ship(int x, int y, int orientation, int speed, int health, int owner) {
+        public Ship(int id, int x, int y, int orientation, int speed, int health, int owner) {
             this(x,y,orientation,owner);
+            this.id = id;
             this.health = health;
             this.speed = speed;
         }
 
+
+        public Ship clone() {
+            Ship ship = new Ship(id, position.getX(),  position.getY(),  orientation, speed, health, owner);
+            return ship;
+        }
 
         public int getOrientation() {
             return orientation;
@@ -677,6 +687,18 @@ class Referee {
             this.shipsAlive = new ArrayList<>();
         }
 
+        @Override
+        public Player clone() {
+            Player player = new Player(this.id);
+            for(Ship ship : ships) {
+                player.ships.add(ship.clone());
+            }
+            for(Ship ship : shipsAlive) {
+                player.shipsAlive.add(ship.clone());
+            }
+            return player;
+        }
+
         public void addShip(Ship ship) {
             ships.add(ship);
             shipsAlive.add(ship);
@@ -736,6 +758,72 @@ class Referee {
 
     public static void main(String... args) throws IOException {
         new Referee(System.in, System.out, System.err);
+    }
+
+    // Copy constructor
+    public Referee(Referee ref) {
+        this.seed = ref.seed;
+        this.cannonballs = ref.cannonballs;
+        this.mines = ref.mines;
+        this.barrels = ref.barrels;
+
+
+        this.players = new ArrayList<>();
+        for(Player player : ref.players) {
+            this.players.add(player.clone());
+        }
+
+        //System.err.println("PREVIOUS SIZE OF PLAYER " + this.players.size());
+        System.err.println("SIZE OF PLAYER " + this.players.size());
+
+        this.ships = ref.ships;
+        this.damage = ref.damage;
+        this.shipLosts = ref.shipLosts;
+        this.cannonballs = ref.cannonballs;
+        this.cannonBallExplosions = ref.cannonBallExplosions;
+        this.shipsPerPlayer = ref.shipsPerPlayer;
+        this.mineCount = ref.mineCount;
+        this.barrelCount = ref.barrelCount;
+        this.random = ref.random;
+    }
+
+    Comparator<Ship> idComparator = new Comparator<Ship>() {
+        public int compare(Ship o1, Ship o2) {
+            if (o1.id == o2.id) {
+                return 1;
+            }
+            return 0;
+        }
+    };
+
+    /**
+     * Evaluation of the score between first referee (the current) and the referee after few rounds (the secondRef)
+     * @param secondRef
+     * @return the score
+     */
+    public int evaluateScore(Referee secondRef) {
+
+        int score = 0;
+
+        int myShipsDead = this.players.get(1).getShips().size() - secondRef.players.get(1).getShips().size();
+        int ennemyShipsDead = this.players.get(0).getShips().size() - secondRef.players.get(0).getShips().size();
+
+        score += myShipsDead*(-500);
+        score += ennemyShipsDead*500;
+
+        List<Ship> shipsBefore = this.players.get(1).getShips();
+        List<Ship> shipsAfter = secondRef.players.get(1).getShips();
+
+        /*for(Ship shipBefore : shipsBefore) {
+            int currentId = shipBefore.getId();
+            int i = Collections.binarySearch(shipsAfter, currentId, idComparator);
+        }*/
+
+        // FIXME: check if ships have the same id
+        for(int i=0; i<shipsBefore.size(); i++) {
+            score += shipsAfter.get(i).getHealth() - shipsBefore.get(i).getHealth();
+        }
+        return score;
     }
 
     protected void initReferee(int playerCount, Properties prop) {
@@ -885,6 +973,15 @@ class Referee {
         cannonBallExplosions.clear();
         damage.clear();
         shipLosts.clear();
+    }
+
+    public Coord getNearestEnnemiesCoord(int myPlayerId, int myShipNumber) {
+        Ship myCurrentShip = players.get(myPlayerId).getShips().get(myShipNumber);
+        List<Entity> ennemieShips = (List<Entity>)(List<?>)players.get(1-myPlayerId).ships;
+
+        Entity nearestEntity = myCurrentShip.getNearestEntity(ennemieShips);
+
+        return  nearestEntity.position;
     }
 
     protected int getExpectedOutputLineCountForPlayer(int playerIdx) {
@@ -1406,6 +1503,7 @@ class Referee {
     protected int getMillisTimeForRound() {
         return 50;
     }
+
 
     public void displayMap() {
         char map[][] = new char[MAP_HEIGHT][MAP_WIDTH];

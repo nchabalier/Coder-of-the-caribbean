@@ -65,7 +65,7 @@ class Player {
 
                 switch (entityType) {
                     case "SHIP":
-                        Referee.Ship ship = new Referee.Ship(x,y,arg1, arg2, arg3, arg4);
+                        Referee.Ship ship = new Referee.Ship(entityId, x,y,arg1, arg2, arg3, arg4);
                         ship.setSpeed(arg2);
                         ship.setHealth(arg3);
                         players.get(arg4).addShip(ship);
@@ -133,6 +133,11 @@ class Player {
             }
 
 
+            //Generate random solution and test it
+            int[] solution = generateRandomSolution(3,myShipCount);
+            int score = evaluateSolution(round,3,myShipCount,solution,ref);
+            System.err.println("Score: " + score);
+
             for (int i = 0; i < myShipCount; i++) {
                 System.out.println(outputs[i]);
             }
@@ -147,4 +152,97 @@ class Player {
 
         }
     }
+
+    /**
+     * Generate a random solution with a vector [ship1MoveAtRound1, ship2MoveAtRound1, ..., ship1MoveAtRoundnbOfRounds, ship2MoveAtRoundnbOfRounds]
+     * @param nbOfRounds : nb of round to evaluate
+     * @param nbOfShips : nb of ships
+     * @return the random solution
+     */
+    public static int[] generateRandomSolution(int nbOfRounds, int nbOfShips) {
+        int[] solution = new int[nbOfRounds*nbOfShips];
+        Random rand = new Random();
+
+        for(int i = 0; i<nbOfRounds*nbOfShips; i++) {
+            solution[i] = rand.nextInt(7);
+        }
+
+        return solution;
+    }
+
+    public static void displaySolution(int[] solution) {
+        System.err.print("SOLUTION ");
+        for(int i = 0; i<solution.length; i++) {
+            System.err.print(solution[i] + " ");
+        }
+        System.err.println("");
+    }
+
+    public static int evaluateSolution(int currentRound, int nbOfRounds, int nbOfShips, int[] mySolution, Referee ref) {
+
+        displaySolution(mySolution);
+
+        //Make a copy of ref
+        Referee testRef = new Referee(ref);
+
+
+
+        for(int i = 0; i<nbOfRounds; i++) {
+            testRef.prepare(currentRound);
+            String[] currentOutputs = getOutputOfSolution(mySolution,i,nbOfShips,testRef);
+
+            for(int k=0; k<nbOfShips; k++) {
+                System.err.println("Move(" + k + ") = " + currentOutputs[k]);
+            }
+
+            try {
+                testRef.handlePlayerOutput(1,currentRound,1,currentOutputs);
+                testRef.updateGame(currentRound);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+        int score = ref.evaluateScore(testRef);
+        return score;
+    }
+
+    public static String[] getOutputOfSolution(int[] solution, int index, int nbShips, Referee ref) {
+        String[] outputs = new String[nbShips];
+
+        for (int i = index * nbShips; i < index* nbShips + nbShips; i++) {
+
+            int currentAction = solution[i];
+            switch (currentAction) {
+                case 0: // FIRE x y
+                    Referee.Coord coord = ref.getNearestEnnemiesCoord(1, i - index * nbShips);
+                    outputs[i - index * nbShips] = "FIRE " + coord.toString();
+                    break;
+                case 1: // MINE
+                    outputs[i - index * nbShips] = "MINE";
+                    break;
+                case 2: // PORT
+                    outputs[i - index * nbShips] = "PORT";
+                    break;
+                case 3: // STARBOARD
+                    outputs[i - index * nbShips] = "STARBOARD";
+                    break;
+                case 4: // FASTER
+                    outputs[i - index * nbShips] = "FASTER";
+                    break;
+                case 5: // SLOWER
+                    outputs[i - index * nbShips] = "SLOWER";
+                    break;
+                case 6: // WAIT
+                    outputs[i - index * nbShips] = "WAIT";
+                    break;
+
+            }
+
+        }
+
+        return outputs;
+    }
+
 }
+
