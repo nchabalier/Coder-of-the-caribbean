@@ -137,7 +137,7 @@ class Player {
             }
 
 
-            generateRandomSolutionsAndPlay(1,3,myShipCount,ref,round);
+            generateRandomSolutionsAndPlay(1,6,myShipCount,ref,round);
 
             round++;
 
@@ -210,7 +210,7 @@ class Player {
         }
 
         String[] finalInput = testRef.getInputForPlayer(currentRound,1);
-        //displayStringArray(finalInput);
+        displayStringArray(finalInput);
 
 
 

@@ -885,6 +885,15 @@ class Referee {
         for(int i=0; i<shipsBefore.size(); i++) {
             score += shipsAfter.get(i).getHealth() - shipsBefore.get(i).getHealth();
         }
+
+        List<Ship> ennemyShipsBefore = this.players.get(0).getShips();
+        List<Ship> ennemyShipsAfter = secondRef.players.get(0).getShips();
+
+        // FIXME: check if ships have the same id
+        for(int i=0; i<ennemyShipsBefore.size(); i++) {
+            score += ennemyShipsBefore.get(i).getHealth()-ennemyShipsAfter.get(i).getHealth();
+        }
+
         return score;
     }
 
@@ -1124,6 +1133,7 @@ class Referee {
             }
 
             if (ball.remainingTurns == 0) {
+                System.err.println("Explosion here:  " + ball.position.toString());
                 cannonBallExplosions.add(ball.position);
             }
         }
@@ -1366,11 +1376,13 @@ class Referee {
             Coord position = it.next();
             for (Ship ship : ships) {
                 if (position.equals(ship.bow()) || position.equals(ship.stern())) {
+                    System.err.println("SHIP HIT !!! ");
                     damage.add(new Damage(position, LOW_DAMAGE, true));
                     ship.damage(LOW_DAMAGE);
                     it.remove();
                     break;
                 } else if (position.equals(ship.position)) {
+                    System.err.println("SHIP HIT !!! ");
                     damage.add(new Damage(position, HIGH_DAMAGE, true));
                     ship.damage(HIGH_DAMAGE);
                     it.remove();
