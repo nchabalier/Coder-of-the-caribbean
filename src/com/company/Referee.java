@@ -739,6 +739,10 @@ class Referee {
             return ships;
         }
 
+        public List<Ship> getShipsAlive() {
+            return shipsAlive;
+        }
+
         public void setDead() {
             for (Ship ship : ships) {
                 ship.health = 0;
@@ -869,8 +873,8 @@ class Referee {
         score += myShipsDead*(-500);
         score += ennemyShipsDead*500;
 
-        List<Ship> shipsBefore = this.players.get(1).getShips();
-        List<Ship> shipsAfter = secondRef.players.get(1).getShips();
+        List<Ship> shipsBefore = this.players.get(1).getShipsAlive();
+        List<Ship> shipsAfter = secondRef.players.get(1).getShipsAlive();
 
         /*for(Ship shipBefore : shipsBefore) {
             int currentId = shipBefore.getId();
@@ -1199,8 +1203,17 @@ class Referee {
             RumBarrel barrel = it.next();
             if (barrel.position.equals(bow) || barrel.position.equals(stern) || barrel.position.equals(center)) {
 
-                System.err.println("COLLISION with barrels ------------------");
+                if(players.get(1).shipsAlive.contains(ship)) {
+
+                    System.err.println("COLLISION with barrels ------------------");
+
+                    System.err.println("Barrel health " + barrel.health);
+                }
+
                 ship.heal(barrel.health);
+                //String shipString = ship.toPlayerString(1);
+                //System.err.println("SHIP STRING " + shipString);
+
                 it.remove();
             }
         }
@@ -1212,7 +1225,7 @@ class Referee {
 
             if (!mineDamage.isEmpty()) {
 
-                System.err.println("COLLISION with barrels ------------------");
+                System.err.println("COLLISION with mines ------------------");
                 damage.addAll(mineDamage);
                 it.remove();
             }

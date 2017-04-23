@@ -73,7 +73,7 @@ class Player {
 
                         break;
                     case "BARREL":
-                        Referee.RumBarrel rumBarrel = new Referee.RumBarrel(x,y,arg3);
+                        Referee.RumBarrel rumBarrel = new Referee.RumBarrel(x,y,15);
                         rumBarrels.add(rumBarrel);
                         break;
                     case"MINE":
@@ -132,15 +132,12 @@ class Player {
                 e.printStackTrace();
             }
 
-
-            //Generate random solution and test it
-            int[] solution = generateRandomSolution(3,myShipCount);
-            int score = evaluateSolution(round,3,myShipCount,solution,ref);
-            System.err.println("Score: " + score);
-
             for (int i = 0; i < myShipCount; i++) {
                 System.out.println(outputs[i]);
             }
+
+
+            generateRandomSolutionsAndPlay(1,3,myShipCount,ref,round);
 
             round++;
 
@@ -185,13 +182,13 @@ class Player {
 
     public static int evaluateSolution(int currentRound, int nbOfRounds, int nbOfShips, int[] mySolution, Referee ref) {
 
-        displaySolution(mySolution);
+        //displaySolution(mySolution);
 
         //Make a copy of ref
         Referee testRef = new Referee(ref);
 
         String[] beginInput = ref.getInputForPlayer(currentRound,1);
-        displayStringArray(beginInput);
+        //displayStringArray(beginInput);
 
         for(int i = 0; i<nbOfRounds; i++) {
             testRef.prepare(currentRound);
@@ -213,12 +210,43 @@ class Player {
         }
 
         String[] finalInput = testRef.getInputForPlayer(currentRound,1);
-        displayStringArray(finalInput);
+        //displayStringArray(finalInput);
 
 
 
         int score = ref.evaluateScore(testRef);
         return score;
+    }
+
+    public static void generateRandomSolutionsAndPlay(int nbSolutionsGenerated, int nbRoundGenerated, int myShipCount, Referee ref, int round) {
+
+        int bestScore = -Integer.MAX_VALUE;
+        int[] bestSolution = null;
+
+        for(int i = 0; i<nbSolutionsGenerated; i++) {
+            //Generate random solution and test it
+            int[] solution = generateRandomSolution(nbRoundGenerated,myShipCount);
+            int score = evaluateSolution(round,nbRoundGenerated,myShipCount,solution,ref);
+            if(score > bestScore) {
+                bestScore = score;
+                bestSolution = solution;
+            }
+        }
+
+        String[] outputs = getOutputOfSolution(bestSolution,0,myShipCount,ref);
+
+        System.err.println("Best score: " + bestScore);
+        displaySolution(bestSolution);
+        displayOutputs(outputs);
+
+    }
+
+    public static void displayOutputs(String[] outputs) {
+
+        for(int i = 0; i<outputs.length; i++) {
+            System.err.println(outputs[i]);
+        }
+
     }
 
     public static String[] getOutputOfSolution(int[] solution, int index, int nbShips, Referee ref) {
