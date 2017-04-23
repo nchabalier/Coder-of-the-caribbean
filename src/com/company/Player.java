@@ -146,10 +146,15 @@ class Player {
 
 
             String[] myInput = ref.getInputForPlayer(round,1);
-            for(String line : myInput) {
-                System.err.println(line);
-            }
 
+
+        }
+    }
+
+    public static void displayStringArray(String[] array) {
+
+        for(String line : array) {
+            System.err.println(line);
         }
     }
 
@@ -185,7 +190,8 @@ class Player {
         //Make a copy of ref
         Referee testRef = new Referee(ref);
 
-
+        String[] beginInput = ref.getInputForPlayer(currentRound,1);
+        displayStringArray(beginInput);
 
         for(int i = 0; i<nbOfRounds; i++) {
             testRef.prepare(currentRound);
@@ -201,8 +207,16 @@ class Player {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            currentRound++;
+
 
         }
+
+        String[] finalInput = testRef.getInputForPlayer(currentRound,1);
+        displayStringArray(finalInput);
+
+
+
         int score = ref.evaluateScore(testRef);
         return score;
     }

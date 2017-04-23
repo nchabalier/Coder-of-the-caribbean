@@ -125,6 +125,11 @@ class Referee {
             this.y = other.y;
         }
 
+        public Coord clone() {
+            Coord coord = new Coord(x, y);
+            return coord;
+        }
+
         public double angle(Coord targetPosition) {
             double dy = (targetPosition.y - this.y) * Math.sqrt(3) / 2;
             double dx = targetPosition.x - this.x + ((this.y - targetPosition.y) & 1) * 0.5;
@@ -280,6 +285,11 @@ class Referee {
             super(EntityType.MINE, x, y);
         }
 
+        public Mine clone() {
+            Mine mine = new Mine(this.position.getX(),this.position.getY());
+            return mine;
+        }
+
         public String toPlayerString(int playerIdx) {
             return toPlayerString(0, 0, 0, 0);
         }
@@ -341,6 +351,11 @@ class Referee {
             this.initialRemainingTurns = this.remainingTurns = remainingTurns;
         }
 
+        public Cannonball clone() {
+            Cannonball cannonball = new Cannonball(position.getX(), position.getY(), ownerEntityId, srcX, srcY, remainingTurns);
+            return cannonball;
+        }
+
         public String toViewString() {
             return join(id, position.y, position.x, srcY, srcX, initialRemainingTurns, remainingTurns, ownerEntityId);
         }
@@ -356,6 +371,11 @@ class Referee {
         public RumBarrel(int x, int y, int health) {
             super(EntityType.BARREL, x, y);
             this.health = health;
+        }
+
+        public RumBarrel clone() {
+            RumBarrel rumBarrel = new RumBarrel(this.position.getX(), this.position.getY(), health);
+            return  rumBarrel;
         }
 
         public String toViewString() {
@@ -376,6 +396,11 @@ class Referee {
             this.position = position;
             this.health = health;
             this.hit = hit;
+        }
+
+        public Damage clone() {
+            Damage damage = new Damage(this.position.clone(),  this.health, this.hit);
+            return damage;
         }
 
         public String toViewString() {
@@ -691,11 +716,12 @@ class Referee {
         public Player clone() {
             Player player = new Player(this.id);
             for(Ship ship : ships) {
-                player.ships.add(ship.clone());
+                Ship shipClone = ship.clone();
+                player.ships.add(shipClone);
+                if(shipsAlive.contains(ship))
+                    player.shipsAlive.add(shipClone);
             }
-            for(Ship ship : shipsAlive) {
-                player.shipsAlive.add(ship.clone());
-            }
+
             return player;
         }
 
@@ -763,25 +789,57 @@ class Referee {
     // Copy constructor
     public Referee(Referee ref) {
         this.seed = ref.seed;
-        this.cannonballs = ref.cannonballs;
-        this.mines = ref.mines;
-        this.barrels = ref.barrels;
 
+
+        this.mines = new ArrayList<>();
+        for(Mine mine : ref.mines) {
+            this.mines.add(mine.clone());
+        }
+
+        this.barrels = new ArrayList<>();
+        for(RumBarrel rumBarrel : ref.barrels) {
+            this.barrels.add(rumBarrel.clone());
+        }
 
         this.players = new ArrayList<>();
         for(Player player : ref.players) {
             this.players.add(player.clone());
         }
 
-        //System.err.println("PREVIOUS SIZE OF PLAYER " + this.players.size());
-        System.err.println("SIZE OF PLAYER " + this.players.size());
 
-        this.ships = ref.ships;
-        this.damage = ref.damage;
-        this.shipLosts = ref.shipLosts;
+        this.ships = new ArrayList<>();
+        for(Player player : players) {
+            ships.addAll(player.ships);
+            //System.err.println("Ships size: " + ships.size());
+        }
+
+        this.damage = new ArrayList<>();
+        for(Damage damage : ref.damage) {
+            this.damage.add(damage.clone());
+        }
+
+        this.shipLosts = new ArrayList<>();
+        for(Ship ship : ref.shipLosts) {
+            this.shipLosts.add(ship.clone());
+        }
+
+        this.cannonballs = new ArrayList<>();
+        for(Cannonball cannonball : ref.cannonballs) {
+            this.cannonballs.add(cannonball.clone());
+        }
+
+        this.cannonBallExplosions = new ArrayList<>();
+        for(Coord cannonballExplosion : ref.cannonBallExplosions) {
+            this.cannonBallExplosions.add(cannonballExplosion.clone());
+        }
+
         this.cannonballs = ref.cannonballs;
         this.cannonBallExplosions = ref.cannonBallExplosions;
+
+
         this.shipsPerPlayer = ref.shipsPerPlayer;
+
+
         this.mineCount = ref.mineCount;
         this.barrelCount = ref.barrelCount;
         this.random = ref.random;
@@ -1137,8 +1195,11 @@ class Referee {
 
         // Collision with the barrels
         for (Iterator<RumBarrel> it = barrels.iterator(); it.hasNext();) {
+
             RumBarrel barrel = it.next();
             if (barrel.position.equals(bow) || barrel.position.equals(stern) || barrel.position.equals(center)) {
+
+                System.err.println("COLLISION with barrels ------------------");
                 ship.heal(barrel.health);
                 it.remove();
             }
@@ -1150,6 +1211,8 @@ class Referee {
             List<Damage> mineDamage = mine.explode(ships, false);
 
             if (!mineDamage.isEmpty()) {
+
+                System.err.println("COLLISION with barrels ------------------");
                 damage.addAll(mineDamage);
                 it.remove();
             }
