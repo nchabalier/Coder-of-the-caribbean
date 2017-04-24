@@ -42,6 +42,9 @@ class Player {
         // game loop
         while (true) {
 
+
+            long startTime = System.currentTimeMillis();
+
             players.get(0).clearShip();
             players.get(1).clearShip();
             //List<Referee.Entity> myShips = new ArrayList<>();
@@ -125,6 +128,7 @@ class Player {
 
             }
 
+            /*
             try {
                 ref.handlePlayerOutput(1,round,1,outputs);
                 ref.updateGame(round);
@@ -135,14 +139,14 @@ class Player {
             for (int i = 0; i < myShipCount; i++) {
                 System.out.println(outputs[i]);
             }
+*/
 
-
-            generateRandomSolutionsAndPlay(1,6,myShipCount,ref,round);
+            generateRandomSolutionsAndPlay(startTime, 100,5,myShipCount,ref,round);
 
             round++;
 
 
-            String[] myInput = ref.getInputForPlayer(round,1);
+            //String[] myInput = ref.getInputForPlayer(round,1);
 
 
         }
@@ -194,23 +198,24 @@ class Player {
             testRef.prepare(currentRound);
             String[] currentOutputs = getOutputOfSolution(mySolution,i,nbOfShips,testRef);
 
-            for(int k=0; k<nbOfShips; k++) {
+            /*for(int k=0; k<nbOfShips; k++) {
                 System.err.println("Move(" + k + ") = " + currentOutputs[k]);
-            }
+            }*/
 
             try {
                 testRef.handlePlayerOutput(1,currentRound,1,currentOutputs);
                 testRef.updateGame(currentRound);
             } catch (Exception e) {
                 e.printStackTrace();
+                break;
             }
             currentRound++;
 
 
         }
 
-        String[] finalInput = testRef.getInputForPlayer(currentRound,1);
-        displayStringArray(finalInput);
+        //String[] finalInput = testRef.getInputForPlayer(currentRound,1);
+        //displayStringArray(finalInput);
 
 
 
@@ -218,12 +223,18 @@ class Player {
         return score;
     }
 
-    public static void generateRandomSolutionsAndPlay(int nbSolutionsGenerated, int nbRoundGenerated, int myShipCount, Referee ref, int round) {
+    public static void generateRandomSolutionsAndPlay(long startTime,int nbSolutionsGenerated, int nbRoundGenerated, int myShipCount, Referee ref, int round) {
+
+        // To avoid problem in the first round (realy long time to get here)
+        if(System.currentTimeMillis()-startTime > 45) {
+            startTime = System.currentTimeMillis();
+        }
 
         int bestScore = -Integer.MAX_VALUE;
         int[] bestSolution = null;
 
-        for(int i = 0; i<nbSolutionsGenerated; i++) {
+        int i=0;
+        while(i<nbSolutionsGenerated && System.currentTimeMillis()-startTime < 45){
             //Generate random solution and test it
             int[] solution = generateRandomSolution(nbRoundGenerated,myShipCount);
             int score = evaluateSolution(round,nbRoundGenerated,myShipCount,solution,ref);
@@ -231,11 +242,14 @@ class Player {
                 bestScore = score;
                 bestSolution = solution;
             }
+
+            i++;
         }
 
         String[] outputs = getOutputOfSolution(bestSolution,0,myShipCount,ref);
 
         System.err.println("Best score: " + bestScore);
+        System.err.println("Number of solutions evaluated: " + i);
         displaySolution(bestSolution);
         displayOutputs(outputs);
 
@@ -244,7 +258,7 @@ class Player {
     public static void displayOutputs(String[] outputs) {
 
         for(int i = 0; i<outputs.length; i++) {
-            System.err.println(outputs[i]);
+            System.out.println(outputs[i]);
         }
 
     }
@@ -257,7 +271,8 @@ class Player {
             int currentAction = solution[i];
             switch (currentAction) {
                 case 0: // FIRE x y
-                    Referee.Coord coord = ref.getNearestEnnemiesCoord(1, i - index * nbShips);
+
+                    Referee.Coord coord = ref.getNextNearestEnnemyPosition(1, i - index * nbShips);
                     outputs[i - index * nbShips] = "FIRE " + coord.toString();
                     break;
                 case 1: // MINE

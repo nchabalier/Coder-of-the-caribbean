@@ -870,28 +870,35 @@ class Referee {
         int myShipsDead = this.players.get(1).getShips().size() - secondRef.players.get(1).getShips().size();
         int ennemyShipsDead = this.players.get(0).getShips().size() - secondRef.players.get(0).getShips().size();
 
-        score += myShipsDead*(-500);
-        score += ennemyShipsDead*500;
+        score += myShipsDead*(-1000);
+        score += ennemyShipsDead*1000;
 
         List<Ship> shipsBefore = this.players.get(1).getShipsAlive();
         List<Ship> shipsAfter = secondRef.players.get(1).getShipsAlive();
 
-        /*for(Ship shipBefore : shipsBefore) {
-            int currentId = shipBefore.getId();
-            int i = Collections.binarySearch(shipsAfter, currentId, idComparator);
-        }*/
-
-        // FIXME: check if ships have the same id
         for(int i=0; i<shipsBefore.size(); i++) {
-            score += shipsAfter.get(i).getHealth() - shipsBefore.get(i).getHealth();
+            Ship currentShipBefore = shipsBefore.get(i);
+            for(Ship currentShipAfter : shipsAfter){
+                if(currentShipBefore.getId() == currentShipAfter.getId()){
+                    score += (currentShipAfter.getHealth() - currentShipBefore.getHealth())*10;
+                    score += currentShipAfter.distanceTo(currentShipBefore)*50;
+                    break;
+                }
+            }
+
         }
 
         List<Ship> ennemyShipsBefore = this.players.get(0).getShips();
         List<Ship> ennemyShipsAfter = secondRef.players.get(0).getShips();
 
-        // FIXME: check if ships have the same id
         for(int i=0; i<ennemyShipsBefore.size(); i++) {
-            score += ennemyShipsBefore.get(i).getHealth()-ennemyShipsAfter.get(i).getHealth();
+            Ship currentShipBefore = ennemyShipsBefore.get(i);
+            for(Ship currentShipAfter : ennemyShipsAfter){
+                if(currentShipBefore.getId() == currentShipAfter.getId()){
+                    score += (currentShipBefore.getHealth() - currentShipAfter.getHealth())*50;
+                    break;
+                }
+            }
         }
 
         return score;
@@ -1047,12 +1054,44 @@ class Referee {
     }
 
     public Coord getNearestEnnemiesCoord(int myPlayerId, int myShipNumber) {
+        return  getNearestEnnemiesShip(myPlayerId,myShipNumber).position;
+    }
+
+    public Entity getNearestEnnemiesShip(int myPlayerId, int myShipNumber) {
         Ship myCurrentShip = players.get(myPlayerId).getShips().get(myShipNumber);
         List<Entity> ennemieShips = (List<Entity>)(List<?>)players.get(1-myPlayerId).ships;
 
         Entity nearestEntity = myCurrentShip.getNearestEntity(ennemieShips);
 
-        return  nearestEntity.position;
+        return  nearestEntity;
+    }
+
+    /**
+     * Get the position of the nearest ennemy in nbRound
+     * @param myPlayerId
+     * @param myShipNumber
+     * @return
+     */
+    public Coord getNextNearestEnnemyPosition(int myPlayerId, int myShipNumber) {
+        Entity shipShooter = players.get(myPlayerId).getShips().get(myShipNumber);
+        Ship ennemyShip = (Ship) getNearestEnnemiesShip(myPlayerId, myShipNumber);
+
+        int nbRound = 1 + (shipShooter.distanceTo(ennemyShip)) / 3;
+
+        Coord nextCoord = ennemyShip.position.clone();
+
+        for(int i=0; i<nbRound*ennemyShip.speed; i++) {
+
+            nextCoord = nextCoord.neighbor(ennemyShip.orientation);
+        }
+
+        if(nextCoord.isInsideMap()) {
+            return nextCoord;
+        } else {
+            return ennemyShip.position;
+        }
+
+
     }
 
     protected int getExpectedOutputLineCountForPlayer(int playerIdx) {
@@ -1103,6 +1142,7 @@ class Referee {
                     ship.setMessage(matchFire.group("message"));
                     ship.fire(x, y);
                 } else {
+                    System.err.println("INVALID ACTION " + line);
                     throw new Exception("A valid action");
                 }
             }
@@ -1133,7 +1173,7 @@ class Referee {
             }
 
             if (ball.remainingTurns == 0) {
-                System.err.println("Explosion here:  " + ball.position.toString());
+                //System.err.println("Explosion here:  " + ball.position.toString());
                 cannonBallExplosions.add(ball.position);
             }
         }
@@ -1213,12 +1253,12 @@ class Referee {
             RumBarrel barrel = it.next();
             if (barrel.position.equals(bow) || barrel.position.equals(stern) || barrel.position.equals(center)) {
 
-                if(players.get(1).shipsAlive.contains(ship)) {
+                /*if(players.get(1).shipsAlive.contains(ship)) {
 
                     System.err.println("COLLISION with barrels ------------------");
 
                     System.err.println("Barrel health " + barrel.health);
-                }
+                }*/
 
                 ship.heal(barrel.health);
                 //String shipString = ship.toPlayerString(1);
@@ -1235,7 +1275,7 @@ class Referee {
 
             if (!mineDamage.isEmpty()) {
 
-                System.err.println("COLLISION with mines ------------------");
+                //System.err.println("COLLISION with mines ------------------");
                 damage.addAll(mineDamage);
                 it.remove();
             }
@@ -1376,13 +1416,13 @@ class Referee {
             Coord position = it.next();
             for (Ship ship : ships) {
                 if (position.equals(ship.bow()) || position.equals(ship.stern())) {
-                    System.err.println("SHIP HIT !!! ");
+                    //System.err.println("SHIP HIT !!! ");
                     damage.add(new Damage(position, LOW_DAMAGE, true));
                     ship.damage(LOW_DAMAGE);
                     it.remove();
                     break;
                 } else if (position.equals(ship.position)) {
-                    System.err.println("SHIP HIT !!! ");
+                    //System.err.println("SHIP HIT !!! ");
                     damage.add(new Damage(position, HIGH_DAMAGE, true));
                     ship.damage(HIGH_DAMAGE);
                     it.remove();
@@ -1446,7 +1486,7 @@ class Referee {
         for (Iterator<Ship> it = ships.iterator(); it.hasNext();) {
             Ship ship = it.next();
             if (ship.health <= 0) {
-                System.err.println("Ship is dead !! ");
+                System.err.println("Ship: " + ship.getId() +" is dead !! ");
                 players.get(ship.owner).shipsAlive.remove(ship);
                 it.remove();
             }
