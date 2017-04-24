@@ -700,7 +700,7 @@ class Referee {
             } else {
                 ennemyHealtWin += health;
             }
-            
+
             if (this.health > MAX_SHIP_HEALTH) {
                 this.health = MAX_SHIP_HEALTH;
             }
@@ -908,6 +908,12 @@ class Referee {
 
                     //score += (currentShipAfter.getHealth() - currentShipBefore.getHealth())*10;
                     //score += currentShipAfter.distanceTo(currentShipBefore)*50;
+
+                    // Less score if we are far away from the nearest barrel (not good idea)
+                    /*if(barrels.size()>0) {
+                        score -= currentShipAfter.distanceTo(currentShipAfter.getNearestEntity((List<Entity>)(List<?>)barrels));
+                    }*/
+
                     if(currentShipAfter.distanceTo(currentShipBefore) <=3) {
                         score-=500;
                     }
@@ -916,6 +922,8 @@ class Referee {
             }
 
         }
+
+
 
 
         //Not use because of a bug ?
