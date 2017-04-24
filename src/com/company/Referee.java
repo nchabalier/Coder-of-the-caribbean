@@ -679,6 +679,13 @@ class Referee {
         }
 
         public void damage(int health) {
+
+            if(this.owner == 1) {
+                myHealtWin -= health;
+            } else {
+                ennemyHealtWin -= health;
+            }
+
             this.health -= health;
             if (this.health <= 0) {
                 this.health = 0;
@@ -687,6 +694,13 @@ class Referee {
 
         public void heal(int health) {
             this.health += health;
+
+            if(this.owner == 1) {
+                myHealtWin += health;
+            } else {
+                ennemyHealtWin += health;
+            }
+            
             if (this.health > MAX_SHIP_HEALTH) {
                 this.health = MAX_SHIP_HEALTH;
             }
@@ -783,6 +797,11 @@ class Referee {
     private int barrelCount;
     private Random random;
 
+    //FIXME: static variable not necessary (and realy ugly here)
+    public static int ennemyHealtWin = 0;
+    public static int myHealtWin = 0;
+
+
     public Referee(InputStream is, PrintStream out, PrintStream err) throws IOException {
     }
 
@@ -792,6 +811,10 @@ class Referee {
 
     // Copy constructor
     public Referee(Referee ref) {
+
+        ennemyHealtWin = 0;
+        myHealtWin = 0;
+
         this.seed = ref.seed;
 
 
@@ -868,10 +891,10 @@ class Referee {
         int score = 0;
 
         int myShipsDead = this.players.get(1).getShips().size() - secondRef.players.get(1).getShips().size();
-        int ennemyShipsDead = this.players.get(0).getShips().size() - secondRef.players.get(0).getShips().size();
+        //int ennemyShipsDead = this.players.get(0).getShips().size() - secondRef.players.get(0).getShips().size();
 
-        score += myShipsDead*(-1000);
-        score += ennemyShipsDead*1000;
+        score += myShipsDead*(-10000);
+        //score += ennemyShipsDead*1000;
 
         List<Ship> shipsBefore = this.players.get(1).getShipsAlive();
         List<Ship> shipsAfter = secondRef.players.get(1).getShipsAlive();
@@ -880,10 +903,13 @@ class Referee {
             Ship currentShipBefore = shipsBefore.get(i);
             for(Ship currentShipAfter : shipsAfter){
                 if(currentShipBefore.getId() == currentShipAfter.getId()){
-                    score += (currentShipAfter.getHealth() - currentShipBefore.getHealth())*10;
-                    score += currentShipAfter.distanceTo(currentShipBefore)*50;
+
+                    //System.err.println("currentShipAfter:" + currentShipAfter.getHealth() + " currentShipBefore:" + currentShipBefore.getHealth());
+
+                    //score += (currentShipAfter.getHealth() - currentShipBefore.getHealth())*10;
+                    //score += currentShipAfter.distanceTo(currentShipBefore)*50;
                     if(currentShipAfter.distanceTo(currentShipBefore) <=3) {
-                        score-=200;
+                        score-=500;
                     }
                     break;
                 }
@@ -892,20 +918,24 @@ class Referee {
         }
 
 
-
-        List<Ship> ennemyShipsBefore = this.players.get(0).getShips();
+        //Not use because of a bug ?
+        /*List<Ship> ennemyShipsBefore = this.players.get(0).getShips();
         List<Ship> ennemyShipsAfter = secondRef.players.get(0).getShips();
 
         for(int i=0; i<ennemyShipsBefore.size(); i++) {
             Ship currentShipBefore = ennemyShipsBefore.get(i);
             for(Ship currentShipAfter : ennemyShipsAfter){
                 if(currentShipBefore.getId() == currentShipAfter.getId()){
-                    score += (currentShipBefore.getHealth() - currentShipAfter.getHealth())*50;
+                    //score += (currentShipBefore.getHealth() - currentShipAfter.getHealth());
                     break;
                 }
             }
-        }
+        }*/
 
+        score += myHealtWin*10;
+        score -= ennemyHealtWin;
+
+        //System.err.println("Score:" + score);
         return score;
     }
 

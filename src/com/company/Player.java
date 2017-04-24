@@ -83,6 +83,7 @@ class Player {
                         break;
                     case"MINE":
                         Referee.Mine mine = new Referee.Mine(x, y);
+                        System.err.println("MINE " + x +" " + y);
                         mines.add(mine);
                         break;
                     case "CANNONBALL":
@@ -143,9 +144,12 @@ class Player {
             }
 */
 
-            //generateRandomSolutionsAndPlay(startTime, 100000,5,myShipCount,ref,round);
+            //String[] finalInput = ref.getInputForPlayer(round,1);
+            //displayStringArray(finalInput);
 
-            hillClimbing(startTime, 5, myShipCount, ref, round);
+            generateRandomSolutionsAndPlay(startTime, 100000,5,myShipCount,ref,round);
+
+            //hillClimbing(startTime, 5, myShipCount, ref, round);
 
             round++;
 
@@ -237,6 +241,8 @@ class Player {
 
         int bestScore = -Integer.MAX_VALUE;
         int[] bestSolution = null;
+
+        round = 0;
 
         int i=0;
         while(i<nbSolutionsGenerated && System.currentTimeMillis()-startTime < 45){
