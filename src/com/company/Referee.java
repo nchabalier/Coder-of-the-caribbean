@@ -1486,7 +1486,7 @@ class Referee {
         for (Iterator<Ship> it = ships.iterator(); it.hasNext();) {
             Ship ship = it.next();
             if (ship.health <= 0) {
-                System.err.println("Ship: " + ship.getId() +" is dead !! ");
+                //System.err.println("Ship: " + ship.getId() +" is dead !! ");
                 players.get(ship.owner).shipsAlive.remove(ship);
                 it.remove();
             }
@@ -1632,6 +1632,9 @@ class Referee {
         return 50;
     }
 
+    public int getNumberOfShipsAlive(int playerId) {
+        return players.get(playerId).getShipsAlive().size();
+    }
 
     public void displayMap() {
         char map[][] = new char[MAP_HEIGHT][MAP_WIDTH];

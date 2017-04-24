@@ -141,7 +141,7 @@ class Player {
             }
 */
 
-            generateRandomSolutionsAndPlay(startTime, 100,5,myShipCount,ref,round);
+            generateRandomSolutionsAndPlay(startTime, 100000,5,myShipCount,ref,round);
 
             round++;
 
@@ -205,6 +205,7 @@ class Player {
             try {
                 testRef.handlePlayerOutput(1,currentRound,1,currentOutputs);
                 testRef.updateGame(currentRound);
+                nbOfShips = testRef.getNumberOfShipsAlive(1);
             } catch (Exception e) {
                 e.printStackTrace();
                 break;
@@ -248,10 +249,19 @@ class Player {
 
         String[] outputs = getOutputOfSolution(bestSolution,0,myShipCount,ref);
 
-        System.err.println("Best score: " + bestScore);
-        System.err.println("Number of solutions evaluated: " + i);
-        displaySolution(bestSolution);
-        displayOutputs(outputs);
+        if(outputs.length > 0) {
+            System.err.println("Best score: " + bestScore);
+            System.err.println("Number of solutions evaluated: " + i);
+            displaySolution(bestSolution);
+            displayOutputs(outputs);
+        } else {
+            System.err.println("NO SOLUTIONS FOUND");
+            Random rand = new Random();
+            int xRand = Math.abs(rand.nextInt())%Referee.MAP_WIDTH;
+            int yRand = Math.abs(rand.nextInt())%Referee.MAP_HEIGHT;
+            outputs[i] = "MOVE " + xRand + " " + yRand; // Any valid action, such as "WAIT" or "MOVE x y"
+        }
+
 
     }
 
