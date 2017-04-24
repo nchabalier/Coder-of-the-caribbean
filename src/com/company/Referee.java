@@ -882,11 +882,16 @@ class Referee {
                 if(currentShipBefore.getId() == currentShipAfter.getId()){
                     score += (currentShipAfter.getHealth() - currentShipBefore.getHealth())*10;
                     score += currentShipAfter.distanceTo(currentShipBefore)*50;
+                    if(currentShipAfter.distanceTo(currentShipBefore) <=3) {
+                        score-=200;
+                    }
                     break;
                 }
             }
 
         }
+
+
 
         List<Ship> ennemyShipsBefore = this.players.get(0).getShips();
         List<Ship> ennemyShipsAfter = secondRef.players.get(0).getShips();
